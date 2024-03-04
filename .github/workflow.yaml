@@ -1,0 +1,37 @@
+name: One Click Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch name'
+        required: true
+        default: 'main'  # Default branch name
+      tag:
+        description: 'Enter the tag for the Docker image'
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3.3
+        with:
+          version: v3.14.0
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+         kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
+
+      - name: Upgrade Helm chart
+        run: |
+          helm upgrade --install nature-frontend ./mychart --set image.repository=${{ secrets.DOCKER_USERNAME }}/nature-frontend-client,image.tag=latest
+      
