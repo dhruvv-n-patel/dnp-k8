@@ -45,19 +45,19 @@ jobs:
 
 
       - name: nature-client
-        if: ${{(inputs.service=="nature client")}}
+        if: ${{ (inputs.service == 'nature client') }}
         run: |
           cd naturechart
           helm install chart3 .
 
       - name: example log
-        if: ${{(inputs.service=="example log")}}
+        if: ${{ (inputs.service == 'example log') }}
         run: |
           cd examplechart
           helm install chart2 .
 
       - name: uptime kuma
-        if: ${{(inputs.service=="uptime kuma")}}
+        if: ${{ (inputs.service == 'uptime kuma') }}
         run: |
           cd uptimechart
           helm install chart2 .
