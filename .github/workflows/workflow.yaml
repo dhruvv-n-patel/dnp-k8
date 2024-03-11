@@ -31,10 +31,7 @@ jobs:
         uses: azure/setup-helm@v3.3
         with:
           version: v3.14.0
-
-      - name: Add helm charts
-        run: helm repo add dnp-k8 https://github.com/dhruvv-n-patel/dnp-k8/tree/main
-
+          
       - name: setup minikube
         run: |
          minikube start
