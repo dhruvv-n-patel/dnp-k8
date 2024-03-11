@@ -7,9 +7,15 @@ on:
         description: 'Branch name'
         required: true
         default: 'main'  # Default branch name
-      tag:
-        description: 'Enter the tag for the Docker image'
+      service:
+        description: 'Pod name'
+        type: choice
         required: true
+        options:
+        - nature client
+        - example log
+        - uptime kuma
+        default: nature client
 
 jobs:
   build-and-push:
@@ -26,12 +32,32 @@ jobs:
         with:
           version: v3.14.0
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v1
-        with:
-         kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
+      - name: Add helm charts
+        run: helm repo add dnp-k8 https://github.com/dhruvv-n-patel/dnp-k8/tree/main
 
-      - name: Upgrade Helm chart
+      - name: setup minikube
         run: |
-          helm upgrade --install nature-frontend ./mychart --set image.repository=${{ secrets.DOCKER_USERNAME }}/nature-frontend-client,image.tag=latest
-      
+         minikube start
+
+      - name: add ingress option
+        run: |
+         minikube addons enable ingress
+
+
+      - name: nature-client
+        if: ${{(inputs.service=="nature client")}}
+        run: |
+          cd naturechart
+          helm install chart3 .
+
+      - name: example log
+        if: ${{(inputs.service=="example log")}}
+        run: |
+          cd examplechart
+          helm install chart2 .
+
+      - name: uptime kuma
+        if: ${{(inputs.service=="uptime kuma")}}
+        run: |
+          cd uptimechart
+          helm install chart2 .
