@@ -8,7 +8,7 @@ on:
         required: true
         default: 'main'  # Default branch name
       service:
-        description: 'Pod name'
+        description: 'Service name'
         type: choice
         required: true
         options:
