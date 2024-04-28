@@ -42,11 +42,11 @@ jobs:
       
       - name: Setup Cluster
         run: |
-          if [ "${{ inputs.cluster }}" == "minikube" ]; then
+          if [ ${{ (inputs.cluster == "minikube")}} ]; then
             minikube start
             minikube addons enable ingress
             kubectl config use-context minikube
-          elif [ "${{ inputs.cluster }}" == "docker-desktop" ]; then
+          elif [ ${{ (inputs.cluster == "docker-desktop") }}  ]; then
             # Any setup specific to Docker Desktop
             echo "Docker Desktop setup"
           fi
