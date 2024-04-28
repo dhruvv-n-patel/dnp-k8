@@ -40,36 +40,44 @@ jobs:
         with:
           version: v3.14.0
       
-      - name: Setup Cluster
+          
+      - name: setup minikube
         run: |
-          if [ ${{ (inputs.cluster == "minikube")}} ]; then
-            minikube start
-            minikube addons enable ingress
-            kubectl config use-context minikube
-          elif [ ${{ (inputs.cluster == "docker-desktop") }}  ]; then
-            # Any setup specific to Docker Desktop
-            echo "Docker Desktop setup"
-          fi
+         minikube start
+
+      - name: add ingress option
+        run: |
+         minikube addons enable ingress
+
+      - name: Setup docker-desktop cluster
+        if: ${{ (inputs.cluster == 'docker-desktop') }}
+        run: |
+          kubectl config use-context docker-desktop
+      
+      - name: Switch to minikube cluster
+        if: ${{ (inputs.cluster == 'minikube') }}
+        run: |
+          kubectl config use-context minikube
 
       - name: Create Namespace
         run: |
-          kubectl create namespace ${{ github.event.inputs.cluster }}-namespace
+          kubectl create namespace ${{ inputs.cluster }}-namespace
 
 
       - name: nature-client
         if: ${{ (inputs.service == 'nature client') }}
         run: |
           cd naturechart
-          helm install chart3 . -n ${{ github.event.inputs.cluster }}-namespace
+          helm install chart3 . -n ${{ inputs.cluster }}-namespace
 
       - name: example log
         if: ${{ (inputs.service == 'example log') }}
         run: |
           cd examplechart
-          helm install chart2 . -n ${{ github.event.inputs.cluster }}-namespace
+          helm install chart2 . -n ${{ inputs.cluster }}-namespace
 
       - name: uptime kuma
         if: ${{ (inputs.service == 'uptime kuma') }}
         run: |
           cd uptimechart
-          helm install chart2 . -n ${{ github.event.inputs.cluster }}-namespace
+          helm install chart2 . -n ${{ inputs.cluster }}-namespace
