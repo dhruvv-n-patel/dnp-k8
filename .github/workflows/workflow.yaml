@@ -81,3 +81,11 @@ jobs:
         run: |
           cd uptimechart
           helm install chart2 . -n ${{ inputs.cluster }}-namespace
+
+      - name: Send telegram notification
+        uses: haishanh/actions-telegram-notification@v1.1.0
+        if: ${{ always() }}
+        with:
+          notification-token: ${{ secrets.NOTIFICATION_TOKEN }}
+          job-status: ${{ job.status }}
+            
