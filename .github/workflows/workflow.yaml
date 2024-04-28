@@ -16,6 +16,14 @@ on:
         - example log
         - uptime kuma
         default: nature client
+      cluster:
+        description: 'Cluster to deploy to'
+        type: choice
+        required: true
+        options:
+        - minikube
+        - docker-desktop
+        default: minikube
 
 jobs:
   build-and-push:
@@ -31,30 +39,37 @@ jobs:
         uses: azure/setup-helm@v3.3
         with:
           version: v3.14.0
-          
-      - name: setup minikube
+      
+      - name: Setup Cluster
         run: |
-         minikube start
+          if [ ${{ github.event.inputs.cluster }} == "minikube" ]; then
+            minikube start
+            minikube addons enable ingress
+            kubectl config use-context minikube
+          elif [ ${{ github.event.inputs.cluster }} == "docker-desktop" ]; then
+            # Any setup specific to Docker Desktop
+            echo "Docker Desktop setup"
+          fi
 
-      - name: add ingress option
+      - name: Create Namespace
         run: |
-         minikube addons enable ingress
+          kubectl create namespace ${{ github.event.inputs.cluster }}-namespace
 
 
       - name: nature-client
         if: ${{ (inputs.service == 'nature client') }}
         run: |
           cd naturechart
-          helm install chart3 .
+          helm install chart3 . -n ${{ github.event.inputs.cluster }}-namespace
 
       - name: example log
         if: ${{ (inputs.service == 'example log') }}
         run: |
           cd examplechart
-          helm install chart2 .
+          helm install chart2 . -n ${{ github.event.inputs.cluster }}-namespace
 
       - name: uptime kuma
         if: ${{ (inputs.service == 'uptime kuma') }}
         run: |
           cd uptimechart
-          helm install chart2 .
+          helm install chart2 . -n ${{ github.event.inputs.cluster }}-namespace
