@@ -12,9 +12,9 @@ on:
         type: choice
         required: true
         options:
-        - nature client
-        - example log
-        - uptime kuma
+        - nature-client
+        - example-log
+        - uptime-kuma
         default: nature client
       cluster:
         description: 'Cluster to deploy to'
@@ -26,7 +26,7 @@ on:
         default: minikube
 
 jobs:
-  build-and-push:
+  Deployment_Stage:
     runs-on: self-hosted
 
     steps:
@@ -48,39 +48,36 @@ jobs:
       - name: add ingress option
         run: |
          minikube addons enable ingress
-
-      - name: Setup docker-desktop cluster
-        if: ${{ (inputs.cluster == 'docker-desktop') }}
-        run: |
-          kubectl config use-context docker-desktop
       
-      - name: Switch to minikube cluster
-        if: ${{ (inputs.cluster == 'minikube') }}
+      - name: Switch to Specific cluster
         run: |
-          kubectl config use-context minikube
+          kubectl config use-context ${{ inputs.cluster }}
 
-      - name: Create Namespace
+      - name: Create secret
         run: |
           kubectl create namespace ${{ inputs.cluster }}-namespace
-
+          kubectl create secret generic service-trust-store --from-file=././manifest/tls.crt --from-file=././manifest/tls.key -o yaml | kubectl apply -f -
 
       - name: nature-client
-        if: ${{ (inputs.service == 'nature client') }}
+        if: ${{ (inputs.service == 'nature-client') }}
         run: |
           cd naturechart
-          helm install chart3 . -n ${{ inputs.cluster }}-namespace
+          kubectl create namespace ${{ inputs.cluster }}-nature-client-devl-namespace
+          helm upgrade --install --wait --timeout 300s --history-max 5 nature-client . -n ${{ inputs.cluster }}-nature-client-devl-namespace
 
       - name: example log
-        if: ${{ (inputs.service == 'example log') }}
+        if: ${{ (inputs.service == 'example-log') }}
         run: |
           cd examplechart
-          helm install chart2 . -n ${{ inputs.cluster }}-namespace
+          kubectl create namespace ${{ inputs.cluster }}-example-log-devl-namespace
+          helm upgrade --install --wait --timeout 300s --history-max 5 example-log . -n ${{ inputs.cluster }}-example-log-devl-namespace
 
       - name: uptime kuma
-        if: ${{ (inputs.service == 'uptime kuma') }}
+        if: ${{ (inputs.service == 'uptime-kuma') }}
         run: |
           cd uptimechart
-          helm install chart2 . -n ${{ inputs.cluster }}-namespace
+          kubectl create namespace ${{ inputs.cluster }}-uptime-kuma-devl-namespace
+          helm upgrade --install --wait --timeout 300s --history-max 5 uptime-kuma . ${{ inputs.cluster }}-uptime-kuma-devl-namespace 
 
       - name: Send telegram notification
         uses: haishanh/actions-telegram-notification@v1.1.0
@@ -88,4 +85,16 @@ jobs:
         with:
           notification-token: ${{ secrets.NOTIFICATION_TOKEN }}
           job-status: ${{ job.status }}
+
+  Deployment_Rollback:
+    runs-on: self-hosted
+    if: failure()
+    needs: [Deployment_Stage]
+    steps:
+    - name: Roll-back Deployment
+      run: |
+          helm rollback ${{inputs.service}}
+        
+
+
             
