@@ -53,6 +53,11 @@ jobs:
         run: |
           kubectl config use-context ${{ inputs.cluster }}
 
+      - name: Apply certificates
+        run: |
+          kubectl apply -f ./manifest/issuer.yaml
+          kubectl apply -f ./manifest/certificate.yaml
+
       # - name: Create secret
       #   run: |
       #     kubectl create namespace ${{ inputs.cluster }}-namespace
