@@ -53,10 +53,10 @@ jobs:
         run: |
           kubectl config use-context ${{ inputs.cluster }}
 
-      - name: Create secret
-        run: |
-          kubectl create namespace ${{ inputs.cluster }}-namespace
-          kubectl create secret generic service-trust-store --from-file=././manifest/tls.crt --from-file=././manifest/tls.key -o yaml | kubectl apply -f -
+      # - name: Create secret
+      #   run: |
+      #     kubectl create namespace ${{ inputs.cluster }}-namespace
+      #     kubectl create secret generic service-trust-store --from-file=././manifest/tls.crt --from-file=././manifest/tls.key -o yaml | kubectl apply -f -
 
       - name: nature-client
         if: ${{ (inputs.service == 'nature-client') }}
