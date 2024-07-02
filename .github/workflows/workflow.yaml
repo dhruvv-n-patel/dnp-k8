@@ -68,21 +68,21 @@ jobs:
         run: |
           cd naturechart
           kubectl create namespace ${{ inputs.cluster }}-nature-client-devl-namespace
-          helm upgrade --install --wait --timeout 300s --history-max 5 nature-client . -n ${{ inputs.cluster }}-nature-client-devl-namespace
+          helm upgrade --install --wait --timeout 240s --history-max 5 nature-client . -n ${{ inputs.cluster }}-nature-client-devl-namespace
 
       - name: example log
         if: ${{ (inputs.service == 'example-log') }}
         run: |
           cd examplechart
           kubectl create namespace ${{ inputs.cluster }}-example-log-devl-namespace
-          helm upgrade --install --wait --timeout 300s --history-max 5 example-log . -n ${{ inputs.cluster }}-example-log-devl-namespace
+          helm upgrade --install --wait --timeout 240s --history-max 5 example-log . -n ${{ inputs.cluster }}-example-log-devl-namespace
 
       - name: uptime kuma
         if: ${{ (inputs.service == 'uptime-kuma') }}
         run: |
           cd uptimechart
           kubectl create namespace ${{ inputs.cluster }}-uptime-kuma-devl-namespace
-          helm upgrade --install --wait --timeout 300s --history-max 5 uptime-kuma . ${{ inputs.cluster }}-uptime-kuma-devl-namespace 
+          helm upgrade --install --wait --timeout 240s --history-max 5 uptime-kuma . ${{ inputs.cluster }}-uptime-kuma-devl-namespace 
 
       - name: Send telegram notification
         uses: haishanh/actions-telegram-notification@v1.1.0
@@ -98,7 +98,7 @@ jobs:
     steps:
     - name: Roll-back Deployment
       run: |
-          helm rollback ${{inputs.service}}
+          helm rollback ${{inputs.service}} -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
         
 
 
