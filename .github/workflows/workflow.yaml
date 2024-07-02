@@ -55,8 +55,8 @@ jobs:
 
       - name: Apply certificates
         run: |
-          kubectl apply -f ./manifest/issuer.yaml
-          kubectl apply -f ./manifest/certificate.yaml
+          kubectl apply -f ./manifest/issuer.yaml -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
+          kubectl apply -f ./manifest/certificate.yaml -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
 
       # - name: Create secret
       #   run: |
