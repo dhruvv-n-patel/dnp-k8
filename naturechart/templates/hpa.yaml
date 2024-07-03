@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "naturechart.fullname" . }}
+  name: {{ include "nature-client.fullname" . }}
   labels:
-    {{- include "naturechart.labels" . | nindent 4 }}
+    {{- include "nature-client.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "naturechart.fullname" . }}
+    name: {{ include "nature-client.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
