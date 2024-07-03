@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "naturechart.fullname" . }}
+  name: {{ include "nature-client.fullname" . }}
   labels:
-    {{- include "naturechart.labels" . | nindent 4 }}
+    {{- include "nature-client.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,5 +12,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "naturechart.selectorLabels" . | nindent 4 }}
+    {{- include "nature-client.selectorLabels" . | nindent 4 }}
 
