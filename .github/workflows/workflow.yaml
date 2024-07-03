@@ -53,11 +53,6 @@ jobs:
         run: |
           kubectl config use-context ${{ inputs.cluster }}
 
-      - name: Apply certificates
-        run: |
-          kubectl apply -f ./manifest/issuer.yaml -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
-          kubectl apply -f ./manifest/certificate.yaml -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
-
       # - name: Create secret
       #   run: |
       #     kubectl create namespace ${{ inputs.cluster }}-namespace
@@ -83,6 +78,11 @@ jobs:
           cd uptimechart
           kubectl create namespace ${{ inputs.cluster }}-uptime-kuma-devl-namespace
           helm upgrade --install --wait --timeout 240s --history-max 5 uptime-kuma . ${{ inputs.cluster }}-uptime-kuma-devl-namespace 
+
+      - name: Apply certificates
+        run: |
+          kubectl apply -f ./manifest/issuer.yaml -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
+          kubectl apply -f ./manifest/certificate.yaml -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
 
       - name: Send telegram notification
         uses: haishanh/actions-telegram-notification@v1.1.0
