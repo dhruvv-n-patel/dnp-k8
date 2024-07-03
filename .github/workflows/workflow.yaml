@@ -81,8 +81,8 @@ jobs:
 
       - name: Apply certificates
         run: |
-          kubectl apply -f ./manifest/issuer.yaml -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
-          kubectl apply -f ./manifest/certificate.yaml -n ${{ inputs.cluster }}-${{ inputs.service }}-devl-namespace
+          kubectl apply -f ./manifest/issuer.yaml 
+          kubectl apply -f ./manifest/certificate.yaml 
 
       - name: Send telegram notification
         uses: haishanh/actions-telegram-notification@v1.1.0
